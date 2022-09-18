@@ -26,6 +26,8 @@ urlpatterns = [
     path('scanner_video/', live.ScannerVideoView.as_view(), name='scanner_video'),
     path('img/', upload.ImageView.as_view(), name='img'),
     path('no_video/', live.NoVideoView.as_view(), name='no_video'),
+    path('stop_recording/', lambda r: HttpResponse(deviceCamera.stop_rec()), name='stop_recording'),
+    path('start_recording/', lambda r: HttpResponse(deviceCamera.start_rec()), name='start_recording'),
     path('camera_feed/', lambda r: StreamingHttpResponse(camera.generate_frames(deviceCamera),content_type='multipart/x-mixed-replace; boundary=frame;')),
     path('get_model_info', lambda r: HttpResponse(json.dumps(Path('lip_reader_ai/models/model_config.json').read_text()))),
     path('take_snippet/', lambda r: HttpResponse(deviceCamera.createVideoSnippet()), name='take_snippet'),

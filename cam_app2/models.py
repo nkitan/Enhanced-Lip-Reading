@@ -80,7 +80,6 @@ class ImagePage(Page):
         return context
 
     def serve(self, request):
-        print('HERE')
         context = self.reset_context(request)
         context["predictedWords"] = ["ABSOLUTELY", "ABUSE"]
         reset()
@@ -92,7 +91,6 @@ class ImagePage(Page):
         #     return render(request, "cam_app2/image.html", context)
 
         if (request.FILES and emptyButtonFlag == False):
-            print("reached here files")
             reset()
             self.reset_context(request)
             context["my_uploaded_file_names"] = []

@@ -1,15 +1,19 @@
 import json
 import cv2
 
+from lip_reader_ai.prediction import VideoCapture
+from .AsyncVideoCapture import AsyncVideoCapture
+
 from datetime import datetime
 
 video_directory = 'word_videos/'
 video_name = "word"
 video_extension = ".mp4"
+camera_device_code = 0
 
 class VideoCamera(object):
     def __init__(self):
-        self.video = cv2.VideoCapture(0)
+        self.video = cv2.VideoCapture(camera_device_code)
         self.current_video_frames = []
 
     def __del__(self):
@@ -18,6 +22,8 @@ class VideoCamera(object):
     def get_frame_with_detection(self):
         check, frame = self.video.read()
         image = frame
+
+        outputImagetoReturn = ''
         if(check == True):
             _, outputImagetoReturn = cv2.imencode('.jpg', image)
         self.current_video_frames.append(frame)
@@ -46,6 +52,16 @@ class VideoCamera(object):
         video.release()
         print("Video Released at " + full_video_name)
         return json.dumps({'videoName': full_video_name})
+    
+    def start_rec(self):
+        if(not self.video.isOpened()):
+            self.video = cv2.VideoCapture(camera_device_code)
+        return json.dumps({"status" : "started recording"})
+    
+    def stop_rec(self):
+        if(self.video is not None):
+            self.video.release()
+        return json.dumps({"status" : "stopped recording"})
 
 def generate_frames(camera):
     try:
