@@ -13,7 +13,7 @@ https://drive.google.com/drive/folders/1Ul-bhYOithL3cFqUdpEaYSm4bTBeLCfG?usp=sha
 
 ### Where to Place Models
 The model directory contains two models which our group trained (10 word model and 20 word model) and another model which has been trained on the full 500 words by other data scientists.
-To use these models you will need to move them into the lipreading/models folder and then after starting the application you will be able to select which model you want to use on a live web-cam stream or on uploaded pre-recorded videos.
+To use these models you will need to move them into the lip_reader_ai/models folder and then after starting the application you will be able to select which model you want to use on a live web-cam stream or on uploaded pre-recorded videos.
 
 This application uses Django for the front-end to make the models that have been used accessable in a web application. 
 
