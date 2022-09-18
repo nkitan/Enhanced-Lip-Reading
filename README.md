@@ -1,9 +1,11 @@
 # Automatic-Lip-Reading
-## Linguistic Learners
-This project contains an Automated Lip Reading (ALR) model using Temporal Convolutional Neural Networks. Two models have been trained for our application using the Lip Reading in the Wild (LRW) dataset.
+## Enhanced-Lip-Reading
+This project contains an Automated Lip Reading (ALR) model using Temporal Convolutional Neural Networks and ResNet18. Two models have been trained for our application using the Lip Reading in the Wild (LRW) dataset.
 
 ### Based Off
 This project was based off mpc001's repository Lipreading_using_Temporal_Convolutional_Networks - https://github.com/mpc001/Lipreading_using_Temporal_Convolutional_Networks
+
+and largely on treevesy's Linguistic-Learners-Automatic-Lip-Reading - https://github.com/treevesy/Linguistic-Learners-Automatic-Lip-Reading
 
 ### Model Directory
 To use this application you will need to download the models from this Google Drive directory below
