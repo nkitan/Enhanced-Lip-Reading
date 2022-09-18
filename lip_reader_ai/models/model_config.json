@@ -1,0 +1,46 @@
+{
+    "models": [
+        {
+            "modelName": "20-words-120-epochs.tar",
+            "displayName": "Resnet18 with MSCTN on 20 words",
+            "configFile": "lrw_resnet18_mstcn.json",
+            "wordsList": "20WordsSortedList.txt",
+            "numClasses": 20
+        },
+        {
+            "modelName": "lrw_resnet18_mstcn_adamw_s3.pth.tar",
+            "displayName": "Resnet18 with MSCTN and adamw_s3 on LRW Dataset",
+            "configFile": "lrw_resnet18_mstcn.json",
+            "wordsList": "500WordsSortedList.txt",
+            "numClasses": 500
+        },
+        {
+            "modelName": "initial-10-words-model.tar",
+            "displayName": "Resnet18 with MSCTN on 10 words",
+            "configFile": "lrw_resnet18_mstcn.json",
+            "wordsList": "10WordsSortedList.txt",
+            "numClasses": 500
+        },
+        {
+            "modelName": "lrw_resnet18_msctn.pth.tar",
+            "displayName": "Resnet18 with MSCTN on LRW Dataset",
+            "configFile": "lrw_resnet18_mstcn.json",
+            "wordsList": "500WordsSortedList.txt",
+            "numClasses": 500
+        },
+        {
+            "modelName": "lrw_snv1x_tcn1x.pth.tar",
+            "displayName": "1x ShuffleNet with 1x TCN on LRW Dataset",
+            "configFile": "lrw_snv1x_tcn1x.json",
+            "wordsList": "500WordsSortedList.txt",
+            "numClasses": 500
+        },
+        {
+            "modelName": "lrw_snv1x_tcn2x.pth.tar",
+            "displayName": "1x ShuffleNet with 2x TCN on LRW Dataset",
+            "configFile": "lrw_snv1x_tcn2x.json",
+            "wordsList": "500WordsSortedList.txt",
+            "numClasses": 500
+        }
+    ]
+}
