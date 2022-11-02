@@ -1,4 +1,5 @@
 {
+    "tcn_type" : "shallow",
     "backbone_type": "shufflenet",
     "relu_type": "prelu",
     "tcn_dropout": 0.2,

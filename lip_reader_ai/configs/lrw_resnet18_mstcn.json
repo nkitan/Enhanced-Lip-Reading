@@ -1,6 +1,7 @@
 {
+    "tcn_type" : "shallow",
     "backbone_type": "resnet-18",
-    "relu_type": "prelu",
+    "relu_type": "swish",
     "tcn_dropout": 0.2,
     "tcn_dwpw": false,
     "tcn_kernel_size": [

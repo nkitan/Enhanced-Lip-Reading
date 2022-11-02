@@ -1,12 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
-from collections import OrderedDict
-from torch.nn import init
-import math
-
-import pdb
 
 def conv_bn(inp, oup, stride):
     return nn.Sequential(

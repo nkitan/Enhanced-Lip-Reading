@@ -1,4 +1,3 @@
-import argparse
 import json
 from collections import deque
 from contextlib import contextmanager
@@ -8,18 +7,19 @@ import cv2
 import face_alignment
 import numpy as np
 import torch
+import uuid
 from torchvision.transforms.functional import to_tensor
 from django.http import HttpResponse
 
 from .lipreading.model import Lipreading
-from .preprocessing.transform import crop_img, warp_img
+from .preprocessing.transform import cut_patch, warp_img
 
 STD_SIZE = (256, 256)
 STABLE_PNTS_IDS = [33, 36, 39, 42, 45]
 START_IDX = 48
 STOP_IDX = 68
 CROP_WIDTH = CROP_HEIGHT = 96
-
+debug = True
 
 @contextmanager
 def VideoCapture(*args, **kwargs):
@@ -30,19 +30,40 @@ def VideoCapture(*args, **kwargs):
         cap.release()
 
 
+# parse config and return LipReading Object
 def load_model(config_path: Path, numClasses):
     with config_path.open() as fp:
+        tcn_options = {}
+        densetcn_options = {}
+
         config = json.load(fp)
-    tcn_options = {
-        'num_layers': config['tcn_num_layers'],
-        'kernel_size': config['tcn_kernel_size'],
-        'dropout': config['tcn_dropout'],
-        'dwpw': config['tcn_dwpw'],
-        'width_mult': config['tcn_width_mult'],
-    }
+        if config['tcn_type'] == 'shallow':
+            tcn_options = {
+                'num_layers': config['tcn_num_layers'],
+                'kernel_size': config['tcn_kernel_size'],
+                'dropout': config['tcn_dropout'],
+                'dwpw': config['tcn_dwpw'],
+                'width_mult': config['tcn_width_mult'],
+            }
+
+        elif config['tcn_type'] == 'dense':
+            densetcn_options = {
+                'block_config' : config['densetcn_block_config'],
+                'growth_rate_set': config['densetcn_growth_rate_set'],
+                'reduced_size': config['densetcn_reduced_size'],
+                'kernel_size_set': config['densetcn_kernel_size_set'],
+                'dilation_size_set': config['densetcn_dilation_size_set'],
+                'dropout': config['densetcn_dropout'],
+                'squeeze_excitation': config['densetcn_se']
+            }
+        
+        else:
+            raise NotImplementedError
+
     return Lipreading(
         num_classes=int(numClasses),
         tcn_options=tcn_options,
+        densetcn_options=densetcn_options,
         backbone_type=config['backbone_type'],
         relu_type=config['relu_type'],
         width_mult=config['width_mult'],
@@ -68,6 +89,11 @@ def getPrediction(response, puType, numClasses, modelPath, configPath, wordListP
     fullWordListPath = 'lip_reader_ai/labels/' + wordListPath
     fullConfigPath = 'lip_reader_ai/configs/' + configPath
     fullModelPath = 'lip_reader_ai/models/' + modelPath
+
+    current_uuid = str(uuid.uuid4())
+    Path('result_images/' + current_uuid).mkdir(parents=True, exist_ok=True)
+    result_path = 'result_images/' + current_uuid
+
     configPath = Path(fullConfigPath)
     modelPath = Path(fullModelPath)
     deviceType = 'cpu' if int(puType) == 0 else 'cuda'
@@ -75,9 +101,10 @@ def getPrediction(response, puType, numClasses, modelPath, configPath, wordListP
 
     fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, device=deviceType)
     model = load_model(configPath, numClasses)
-    model.load_state_dict(torch.load(modelPath, map_location=deviceType)['model_state_dict'])
+    model.load_state_dict(torch.load(modelPath, map_location = deviceType)['model_state_dict'])
     model = model.to(deviceType)
 
+    # load face landmarks
     mean_face_landmarks = np.load(Path('lip_reader_ai/landmarks/words_mean_face.npy'))
 
     with Path(fullWordListPath).open() as fp:
@@ -90,6 +117,8 @@ def getPrediction(response, puType, numClasses, modelPath, configPath, wordListP
         queueLength = length
         queue = deque(maxlen=queueLength)
         print("Length of video: ", length)
+        counter = 0
+
         while True:
             ret, image_np = cap.read()
             if not ret:
@@ -101,11 +130,15 @@ def getPrediction(response, puType, numClasses, modelPath, configPath, wordListP
                 landmarks = all_landmarks[0]
 
                 # BEGIN PROCESSING
-
                 trans_frame, trans = warp_img(landmarks[STABLE_PNTS_IDS, :], mean_face_landmarks[STABLE_PNTS_IDS, :], image_np, STD_SIZE)
                 trans_landmarks = trans(landmarks)
-                patch = crop_img(trans_frame, trans_landmarks[START_IDX:STOP_IDX], CROP_HEIGHT // 2, CROP_WIDTH // 2)
-
+                patch = cut_patch(trans_frame, trans_landmarks[START_IDX:STOP_IDX], CROP_HEIGHT // 2, CROP_WIDTH // 2)
+                
+                if debug == True:
+                    counter = counter + 1
+                    current_path = result_path + '/' + str(counter) + '.png'
+                    print('File Written to ' + current_path if cv2.imwrite(current_path, patch) else 'Could not write file ' + current_path)
+                
                 patch_torch = to_tensor(cv2.cvtColor(patch, cv2.COLOR_RGB2GRAY)).to(deviceType)
                 queue.append(patch_torch)
 
@@ -127,6 +160,7 @@ def getPrediction(response, puType, numClasses, modelPath, configPath, wordListP
                         occurrences.update({vocab[top]:1})
                     
                     if vocab[top] in highest_confidence:
+                        # Update highest confidence on the vocab
                         if (highest_confidence[vocab[top]] < probs[top]):
                             highest_confidence[vocab[top]] = probs[top]
                     else:

@@ -1,11 +1,18 @@
 {
     "models": [
         {
-            "modelName": "20-words-120-epochs.tar",
-            "displayName": "Resnet18 with MSCTN on 20 words",
-            "configFile": "lrw_resnet18_mstcn.json",
-            "wordsList": "20WordsSortedList.txt",
-            "numClasses": 20
+            "modelName": "lrw_resnet18_dctcn_video.pth.tar",
+            "displayName": "Resnet18 with DCCTN on LRW Dataset",
+            "configFile": "lrw_resnet18_dctcn.json",
+            "wordsList": "500WordsSortedList.txt",
+            "numClasses": 500
+        },
+        {
+            "modelName": "lrw_resnet18_dctcn_video_boundary.pth.tar",
+            "displayName": "Resnet18 with DCCTN on Video Boundary LRW Dataset",
+            "configFile": "lrw_resnet18_dctcn_boundary.json",
+            "wordsList": "500WordsSortedList.txt",
+            "numClasses": 500
         },
         {
             "modelName": "lrw_resnet18_mstcn_adamw_s3.pth.tar",
@@ -19,12 +26,19 @@
             "displayName": "Resnet18 with MSCTN on 10 words",
             "configFile": "lrw_resnet18_mstcn.json",
             "wordsList": "10WordsSortedList.txt",
-            "numClasses": 500
+            "numClasses": 10
         },
         {
             "modelName": "lrw_resnet18_msctn.pth.tar",
             "displayName": "Resnet18 with MSCTN on LRW Dataset",
             "configFile": "lrw_resnet18_mstcn.json",
+            "wordsList": "500WordsSortedList.txt",
+            "numClasses": 500
+        },
+        {
+            "modelName": "lrw_resnet34_msctn.pth.tar",
+            "displayName": "Resnet34 with MSCTN on LRW Dataset",
+            "configFile": "lrw_resnet34_mstcn.json",
             "wordsList": "500WordsSortedList.txt",
             "numClasses": 500
         },

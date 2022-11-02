@@ -1,9 +1,7 @@
 
 import math
 import torch.nn as nn
-import pdb
-
-
+from .swish import Swish
 
 def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
@@ -27,11 +25,10 @@ def downsample_basic_block_v2( inplanes, outplanes, stride ):
 
 class BasicBlock(nn.Module):
     expansion = 1
-
-    def __init__(self, inplanes, planes, stride=1, downsample=None, relu_type = 'relu' ):
+    def __init__(self, inplanes, planes, stride=1, downsample=None, relu_type = 'prelu' ):
         super(BasicBlock, self).__init__()
 
-        assert relu_type in ['relu','prelu']
+        assert relu_type in ['relu','prelu', 'swish']
 
         self.conv1 = conv3x3(inplanes, planes, stride)
         self.bn1 = nn.BatchNorm2d(planes)
@@ -43,13 +40,16 @@ class BasicBlock(nn.Module):
         elif relu_type == 'prelu':
             self.relu1 = nn.PReLU(num_parameters=planes)
             self.relu2 = nn.PReLU(num_parameters=planes)
+        elif relu_type == 'swish':
+            self.relu1 = Swish()
+            self.relu2 = Swish()
         else:
             raise Exception('relu type not implemented')
         # --------
 
         self.conv2 = conv3x3(planes, planes)
         self.bn2 = nn.BatchNorm2d(planes)
-        
+
         self.downsample = downsample
         self.stride = stride
 
@@ -70,7 +70,6 @@ class BasicBlock(nn.Module):
 
 
 class ResNet(nn.Module):
-
     def __init__(self, block, layers, num_classes=1000, relu_type = 'relu', gamma_zero = False, avg_pool_downsample = False):
         self.inplanes = 64
         self.relu_type = relu_type
@@ -92,8 +91,6 @@ class ResNet(nn.Module):
             elif isinstance(m, nn.BatchNorm2d):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
-                #nn.init.ones_(m.weight)
-                #nn.init.zeros_(m.bias)
 
         if self.gamma_zero:
             for m in self.modules():
@@ -101,12 +98,10 @@ class ResNet(nn.Module):
                     m.bn2.weight.data.zero_()
 
     def _make_layer(self, block, planes, blocks, stride=1):
-
-
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
-            downsample = self.downsample_block( inplanes = self.inplanes, 
-                                                 outplanes = planes * block.expansion, 
+            downsample = self.downsample_block( inplanes = self.inplanes,
+                                                 outplanes = planes * block.expansion,
                                                  stride = stride )
 
         layers = []

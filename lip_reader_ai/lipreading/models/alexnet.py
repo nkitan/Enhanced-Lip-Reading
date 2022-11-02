@@ -1,8 +1,5 @@
 import torch.nn as nn
 import torch.nn.functional as F
-import tensorflow as tf
-from tensorflow.keras import layers
-from tensorflow.keras import Model
 
 class AlexNet(nn.Module):
     def __init__(self):
@@ -23,8 +20,6 @@ class AlexNet(nn.Module):
         x = F.relu(self.conv2(x))
         x = self.maxpool(x)
         x = F.relu(self.conv3(x))
-        #x = F.relu(self.conv4(x))
-        #x = F.relu(self.conv5(x))
         x = self.maxpool(x)
         x = x.reshape(x.shape[0], -1)
         x = F.relu(self.fc1(x))
