@@ -1,4 +1,4 @@
-Django>=4
+django>=4
 wagtail>=4
 django_extensions>=3.2.0
 numpy>=1.23.2
